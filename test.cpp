@@ -10,19 +10,14 @@
 #include <opencv2/video/background_segm.hpp>
 
 #include <iostream>
-#include <Windows.h>
+//#include <Windows.h>
 
 using namespace cv;
 using namespace std;
 
 //Global variables
 Mat curFrame;   //current frame
-int keyboard;   //input from keyboard
-
-int const max_elem = 2;
-int const max_kernel_size = 21;
-int open_elem = 0;
-int open_size = 0;
+int keyboard = 0;   //input from keyboard
 
 void processImages();
 string generateFileName(int index);
@@ -30,41 +25,55 @@ string generateFileName(int index);
 int main()
 {
 	processImages();
-	while (1);
-	
+
 	destroyAllWindows();
 	return EXIT_SUCCESS;
 }
 
-void processImages() 
+void processImages()
 {
-
 	namedWindow("Original", CV_WINDOW_NORMAL);
 	namedWindow("Motion", CV_WINDOW_NORMAL);
 
-	string fileName = generateFileName(304);
-
-	Mat frame1 = imread(fileName);
-	resize(frame1, frame1, Size(960, 540), (0, 0), (0, 0), cv::INTER_LINEAR);
-	fileName = generateFileName(305);
-
-	Mat frame2 = imread(fileName);
-	resize(frame2, frame2, Size(960, 540), (0, 0), (0, 0), cv::INTER_LINEAR);
-	fileName = generateFileName(306);
-
-	Mat frame3 = imread(fileName);
-	resize(frame3, frame3, Size(960, 540), (0, 0), (0, 0), cv::INTER_LINEAR);
+	string fileName;
+	Mat frames[3];
 	Mat motion;
 	Mat motion2;
-	absdiff(frame1, frame2, motion);
-	absdiff(frame2, frame3, motion2);
-	absdiff(motion, motion2, motion);
-	threshold(motion, motion, 15, 255, THRESH_BINARY);
-	morphologyEx(motion, motion, MORPH_OPEN, getStructuringElement(MORPH_RECT, Size(10, 10)));
-	imshow("Original", frame1);
-	imshow("Motion", motion);
-	
-	waitKey(100000);
+
+	int index = 1;
+	while (index < 530)
+	{
+		fileName = generateFileName(index);
+		curFrame = imread(fileName);
+		resize(curFrame, curFrame, Size(960, 540), (0, 0), (0, 0), cv::INTER_LINEAR);
+
+		//update the buffer
+		int currIndex = (index - 1) % 3;
+		frames[currIndex] = curFrame;
+
+		if (currIndex == 2)
+		{
+			absdiff(frames[0], frames[1], motion);
+			absdiff(frames[1], frames[2], motion2);
+			absdiff(motion, motion2, motion);
+			threshold(motion, motion, 15, 255, THRESH_BINARY);
+
+			//Morphology OPEN & CLOSE
+			morphologyEx(motion, motion, MORPH_OPEN, getStructuringElement(MORPH_RECT, Size(10, 10)));
+			morphologyEx(motion, motion, MORPH_CLOSE, getStructuringElement(MORPH_RECT, Size(20, 20)));
+		}
+
+		imshow("Original", curFrame);
+
+		if (index > 2)
+			imshow("Motion", motion);
+		
+		index++;
+		waitKey(50);
+	}
+
+	while ((char)keyboard != 'q' && (char)keyboard != 27)
+		keyboard = waitKey(0);
 }
 
 string generateFileName(int index = 1)
