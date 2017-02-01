@@ -1,20 +1,14 @@
-# cmake needs this line
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.7)
 
-# Define project name
-project(TEST)
+project( Background )
 
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 3.2.0 REQUIRED PATHS /usr/local/Cellar/opencv3/3.2.0/share/)
 
-# Print some message showing some of them
+#print message
 message(STATUS "OpenCV library status:")
 message(STATUS "    version: ${OpenCV_VERSION}")
 message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
 
-include_directories(${OpenCV_INCLUDE_DIRS})
-
-#Declare the executable
-add_executable(test main.cpp)
-
-#Libraries
-target_link_libraries(test ${OpenCV_LIBS})
+add_executable( Background test.cpp )
+include_directories( ${OpenCV_INCLUDE_DIRS})
+target_link_libraries( Background ${OpenCV_LIBS} )
