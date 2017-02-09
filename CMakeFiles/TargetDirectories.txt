@@ -1,3 +1,0 @@
-/Users/will/Desktop/Animals/ImageProcessing/CMakeFiles/rebuild_cache.dir
-/Users/will/Desktop/Animals/ImageProcessing/CMakeFiles/edit_cache.dir
-/Users/will/Desktop/Animals/ImageProcessing/CMakeFiles/Background.dir
