@@ -21,6 +21,7 @@ int keyboard = 0;   //input from keyboard
 
 void processImages();
 string generateFileName(int index);
+bool checkGrayscale(Mat src);
 
 int main()
 {
@@ -39,14 +40,16 @@ void processImages()
 	Mat frames[3];
 	Mat motion;
 	Mat motion2;
-
+    
 	int index = 1;
-	while (index < 530)
+	while (index < 530 && (char)keyboard != 'q' && (char)keyboard != 27)
 	{
+        int pixels = 0;
 		fileName = generateFileName(index);
+        //cout << fileName << endl;
 		curFrame = imread(fileName);
-		resize(curFrame, curFrame, Size(960, 540), (0, 0), (0, 0), cv::INTER_LINEAR);
-
+		resize(curFrame, curFrame, Size(960, 540));
+        
 		//update the buffer
 		int currIndex = (index - 1) % 3;
 		frames[currIndex] = curFrame;
@@ -59,17 +62,31 @@ void processImages()
 			threshold(motion, motion, 15, 255, THRESH_BINARY);
 
 			//Morphology OPEN & CLOSE
-			morphologyEx(motion, motion, MORPH_OPEN, getStructuringElement(MORPH_RECT, Size(10, 10)));
-			morphologyEx(motion, motion, MORPH_CLOSE, getStructuringElement(MORPH_RECT, Size(20, 20)));
+			morphologyEx(motion, motion, MORPH_OPEN, getStructuringElement(MORPH_RECT, Size(15, 15)));
+			morphologyEx(motion, motion, MORPH_CLOSE, getStructuringElement(MORPH_CROSS, Size(10, 10)));
 		}
 
 		imshow("Original", curFrame);
 
-		if (index > 2)
+        if (index > 2)
+        {
+            Mat tmp;
+            cvtColor(motion, tmp, cv::COLOR_RGB2GRAY);
 			imshow("Motion", motion);
-		
+            
+            pixels = countNonZero(tmp==0);
+            pixels = 518400 - pixels;
+        }
+        
+        /*threshold
+        if (pixels > 0)
+            cout << fileName << "    " << pixels << endl;*/
+        
+        
+        checkGrayscale(curFrame);
+        
 		index++;
-		waitKey(50);
+		keyboard = waitKey(50);
 	}
 
 	while ((char)keyboard != 'q' && (char)keyboard != 27)
@@ -78,7 +95,7 @@ void processImages()
 
 string generateFileName(int index = 1)
 {
-	const string path = "C:\\Users\\Will\\Documents\\ImageProcessing\\DATA\\Woodpile road\\";
+	const string path = "/Users/will/Desktop/DATA/";
 	const string prefix = "IMG_";
 	const string suffix = ".JPG";
 	string name = path + prefix;
@@ -93,4 +110,21 @@ string generateFileName(int index = 1)
 	name = name + to_string(index) + suffix;
 
 	return name;
+}
+
+int countPixels(Mat a)
+{
+    return countNonZero(a);
+}
+
+
+bool checkGrayscale(Mat src)
+{
+    Mat bgr[3];
+    split(src,bgr);//split source
+    
+    cv::Mat diff = bgr[0] != bgr[1];
+    bool eq = cv::countNonZero(diff) == 0;
+    cout << eq << endl;
+    return eq;
 }
