@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
+<head>
+<title>File Uploading Form</title>
+</head>
 <body>
-
-<form action="" method="post" enctype = "multipart/form-data">
-  Animal:<br>
-  <input type="text" name="animal" value="text here">
-  <br><br>
-  <input type="submit" value="Submit">
-</form> 
-
+<h3>File Upload:</h3>
+Select a file to upload: <br />
+<form action="http://localhost:3000/file_upload" method="POST" enctype="multipart/form-data">
+<input type="file" name="file" size="50" />
+<br />
+<input type="submit" value="Upload File" />
+</form>
 </body>
 </html>
