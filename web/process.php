@@ -1,0 +1,3 @@
+<?php
+exec(process.out) ;
+?>
