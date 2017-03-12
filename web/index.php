@@ -112,6 +112,30 @@ Pls enter ur key:
 </form>
 
 
+<form action="process.php" class="form-horizontal">
+<fieldset>
+
+<!-- Form Name -->
+<legend>Process</legend>
+
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="singlebutton"></label>
+  <div class="col-md-4">
+    <button id="singlebutton" name="singlebutton" class="btn btn-success">Process</button>
+  </div>
+</div>
+
+</fieldset>
+</form>
+
+
+<form action="test.php" method="post" enctype="multipart/form-data">
+    Select image to upload:
+    <input type="file" name="fileToUpload" id="fileToUpload">
+    <input type="submit" value="Upload Image" name="submit">
+</form>
+
 <!--
 <?php
 echo '<a href="download2.php">Download All Images</br>';
@@ -120,4 +144,3 @@ echo '<a href="clean.php">Clean the database</br>';
 -->
 </body>
 </html>
-
