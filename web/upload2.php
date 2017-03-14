@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
               $mysqli->query($query) or die('Error, query failed'); 
               if (move_uploaded_file($_FILES['files']['tmp_name'][$i], $target_file)) {
         echo "The SP file ". basename( $_FILES['files']['name'][$i]). " has been uploaded.";
+        echo "-- ". $target_file."--";
     }
 else {echo "The SP file failed";}
 
