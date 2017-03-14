@@ -10,106 +10,148 @@
 #include <opencv2/video/background_segm.hpp>
 
 #include <iostream>
-//#include <Windows.h>
+
+#include "mysql_connection.h"
+
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
 
 using namespace cv;
 using namespace std;
 
 //Global variables
-Mat curFrame;   //current frame
-int keyboard = 0;   //input from keyboard
+Mat curFrame;     //current frame
+int keyboard = 0; //input from keyboard
 
-void processImages();
+void processImages(char *argv[]);
 string generateFileName(int index);
 bool checkGrayscale(Mat src);
 
-int main()
+//main function
+int main(int argc, char *argv[])
 {
-	processImages();
+    try
+    {
 
-	destroyAllWindows();
-	return EXIT_SUCCESS;
+	processImages(argv);
+    }
+    catch (sql::SQLException &e)
+    {
+    }
+
+    //destroyAllWindows();
+    return EXIT_SUCCESS;
 }
 
-void processImages()
+void processImages(char *argv[])
 {
-	namedWindow("Original", CV_WINDOW_NORMAL);
-	namedWindow("Motion", CV_WINDOW_NORMAL);
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::Statement *stmt;
 
-	string fileName;
-	Mat frames[3];
-	Mat motion;
-	Mat motion2;
-    
-	int index = 1;
-	while (index < 530 && (char)keyboard != 'q' && (char)keyboard != 27)
+    /* Create a connection */
+    driver = get_driver_instance();
+    con = driver->connect("localhost", "root", "usbw");
+    /* Connect to the MySQL test database */
+    con->setSchema("test");
+
+    stmt = con->createStatement();
+
+    //namedWindow("Original", CV_WINDOW_NORMAL);
+    //namedWindow("Motion", CV_WINDOW_NORMAL);
+
+    const string path = "/var/www/html/uploads/";
+    string names[3];
+    names[0] = path + string(argv[1]);
+    names[1] = path + string(argv[2]);
+    names[2] = path + string(argv[3]);
+
+    string fileName;
+    Mat frames[3];
+    Mat motion;
+    Mat motion2;
+
+    bool flag = 0;
+
+    for (int index = 1; index < 4; index++)
+    {
+	int pixels = 0;
+	//fileName = generateFileName(index);
+
+	curFrame = imread(names[index - 1]);
+	resize(curFrame, curFrame, Size(960, 540));
+
+	//update the buffer
+	int currIndex = (index - 1) % 3;
+	frames[currIndex] = curFrame;
+
+	if (currIndex == 2)
 	{
-        int pixels = 0;
-		fileName = generateFileName(index);
-        //cout << fileName << endl;
-		curFrame = imread(fileName);
-		resize(curFrame, curFrame, Size(960, 540));
-        
-		//update the buffer
-		int currIndex = (index - 1) % 3;
-		frames[currIndex] = curFrame;
+	    absdiff(frames[0], frames[1], motion);
+	    absdiff(frames[1], frames[2], motion2);
+	    absdiff(motion, motion2, motion);
+	    threshold(motion, motion, 15, 255, THRESH_BINARY);
 
-		if (currIndex == 2)
-		{
-			absdiff(frames[0], frames[1], motion);
-			absdiff(frames[1], frames[2], motion2);
-			absdiff(motion, motion2, motion);
-			threshold(motion, motion, 15, 255, THRESH_BINARY);
-
-			//Morphology OPEN & CLOSE
-			morphologyEx(motion, motion, MORPH_OPEN, getStructuringElement(MORPH_RECT, Size(15, 15)));
-			morphologyEx(motion, motion, MORPH_CLOSE, getStructuringElement(MORPH_CROSS, Size(10, 10)));
-		}
-
-		imshow("Original", curFrame);
-
-        if (index > 2)
-        {
-            Mat tmp;
-            cvtColor(motion, tmp, cv::COLOR_RGB2GRAY);
-			imshow("Motion", motion);
-            
-            pixels = countNonZero(tmp==0);
-            pixels = 518400 - pixels;
-        }
-        
-        /*threshold
-        if (pixels > 0)
-            cout << fileName << "    " << pixels << endl;*/
-        
-        
-        checkGrayscale(curFrame);
-        
-		index++;
-		keyboard = waitKey(50);
+	    //Morphology OPEN & CLOSE
+	    morphologyEx(motion, motion, MORPH_OPEN, getStructuringElement(MORPH_RECT, Size(15, 15)));
+	    morphologyEx(motion, motion, MORPH_CLOSE, getStructuringElement(MORPH_CROSS, Size(10, 10)));
 	}
 
-	while ((char)keyboard != 'q' && (char)keyboard != 27)
-		keyboard = waitKey(0);
+	//imshow("Original", curFrame);
+
+	if (index > 2)
+	{
+	    Mat tmp;
+	    cvtColor(motion, tmp, cv::COLOR_RGB2GRAY);
+	    //imshow("Motion", motion);
+
+	    pixels = countNonZero(tmp == 0);
+	    pixels = 518400 - pixels;
+	}
+
+	cout << pixels << "   ";
+	if (index > 2 && pixels < 1000)
+	{
+	    flag = 1;
+	}
+
+	checkGrayscale(curFrame);
+    }
+
+    if (flag == 1)
+    {
+	for (int i = 0; i < 3; i++)
+	{
+	    string command = "UPDATE upload SET animal = 0 WHERE name = \"" + string(argv[i+1]) + "\";";
+	    cout << command << endl;
+	    stmt->execute(command);
+	}
+    }
+
+    cout << "end" << endl;
+    delete stmt;
+    delete con;
 }
 
 string generateFileName(int index = 1)
 {
-	const string path = "/Users/will/Desktop/DATA/";
-	const string prefix = "IMG_";
-	const string suffix = ".JPG";
-	string name = path + prefix;
+    const string path = "/var/www/html/uploads/";
+    const string prefix = "IMG_";
+    const string suffix = ".JPG";
+    string name = path + prefix;
 
-	int n = 0;
-	for (int i = index; i > 9; i /= 10)
-		n++;
+    int n = 0;
+    for (int i = index; i > 9; i /= 10)
+	n++;
 
-	for (int i = 0; i < 3 - n; i++)
-		name = name + '0';
+    for (int i = 0; i < 3 - n; i++)
+	name = name + '0';
 
-	name = name + to_string(index) + suffix;
+    name = name + to_string(index) + suffix;
 
-	return name;
+    return name;
 }
 
 int countPixels(Mat a)
@@ -117,14 +159,13 @@ int countPixels(Mat a)
     return countNonZero(a);
 }
 
-
 bool checkGrayscale(Mat src)
 {
     Mat bgr[3];
-    split(src,bgr);//split source
-    
+    split(src, bgr); //split source
+
     cv::Mat diff = bgr[0] != bgr[1];
-    bool eq = cv::countNonZero(diff) == 0;
-    cout << eq << endl;
+
+    bool eq = cv::countNonZero(diff == 255) <= 2600;
     return eq;
 }
