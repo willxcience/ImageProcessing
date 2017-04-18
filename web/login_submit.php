@@ -92,6 +92,12 @@ else
 
                 /*** tell the user we are logged in ***/
                 $message = 'You are now logged in';
+		/* Redirect browser */
+		header("Location: http://10.0.2.15/");
+ 
+		/* Make sure that code below does not get executed when we redirect. */
+    		exit;
+		
         }
 
 
