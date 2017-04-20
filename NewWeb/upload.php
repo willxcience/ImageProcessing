@@ -2,7 +2,7 @@
 
 error_reporting(E_ALL); ini_set('display_errors', '1');
 
-$target_dir = "/home/will/Desktop/uploads/";
+$target_dir = "/mnt/data/IMAGEDATA/";
 $host= "localhost";
 $username="root";
 $userpass="usbw";
@@ -13,12 +13,32 @@ if ($mysqli->connect_errno){
     echo "huston we have a problem";
  }
 
+if (isset($_POST['submit_check'])){
+    $foldername =  $_POST['foldername'];
 
+	$Warning = "This name is available!";
+    if (!$foldername)
+        $Warning = "Please enter a name!";
+	else {
+		$sql ='select * from upload where foldername ="' . $foldername . '"';
+    	$result = $mysqli->query($sql);
+
+		$tmp = mysqli_num_rows($result);
+		if ($tmp != 0)
+			$Warning = "Project name already exists!";
+	}
+	
+	
+    echo '<script type="text/javascript">
+		alert("' . $Warning . '");
+		history.go(-1);
+	 	</script>';
+    exit(0);  	
+}
 
 if (isset($_POST['submit'])){
 
     $foldername =  $_POST['foldername'];
-
     if (!$foldername)
         die("Please enter a name!");
 
@@ -27,9 +47,12 @@ if (isset($_POST['submit'])){
 
     if (mysqli_num_rows($result)){
         die("Project name already exists!");
-    } else {
-        echo "Uploading images to " . $foldername . "\n";
     }
+
+    if (!$_FILES['files']['name'][0])
+	die("No Files Input!");
+
+    echo "Uploading images to " . $foldername . "\n";
 
     //make a new directory for the database
     if (!mkdir($target_dir . basename($foldername), 0777, true)) {

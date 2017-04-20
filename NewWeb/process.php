@@ -34,14 +34,18 @@ while($row = $result->fetch_row()) {
     $row = $result->fetch_row();
     array_push($temp,$row[0]);
 
-    $output=shell_exec("/home/will/Desktop/temp/Background ".$temp[0]." ".$temp[1]." ".$temp[2]);
+    $output=shell_exec("/home/applications/Background ".$temp[0]." ".$temp[1]." ".$temp[2]);
 
     if ($output != -1) {
         foreach($temp as $i) {
             $sql = 'UPDATE upload SET backgroundProcessed = 1 Where path = "' . $i . '"';
             $mysqli->query($sql);
-            $sql = 'UPDATE upload SET isBackground = ' .$output . ' Where path = "' . $i . '"';
-            $mysqli->query($sql);
+
+	    	if ($output == 1) {
+            	$sql = 'UPDATE upload SET isBackground = ' .$output . ' Where path = "' . $i . '"';
+            	$mysqli->query($sql);
+			}
+
         }
     }
 }

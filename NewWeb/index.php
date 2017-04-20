@@ -20,7 +20,7 @@
 
 
 <!-- Upload a Folder -->
-<form class="form-horizontal" action="upload.php"  method="post" enctype="multipart/form-data">
+<form class="form-horizontal" name = "myForm" action="upload.php"  method="post" enctype="multipart/form-data">
 <fieldset>
 
 <!-- Form Name -->
@@ -31,6 +31,14 @@
   <label class="col-md-4 control-label" for="foldername">Create a new name</label>
   <div class="col-md-4">
     <input type='text' name='foldername'>
+  </div>
+</div>
+
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="submit"></label>
+  <div class="col-md-4">
+    <button id="submit" name="submit_check" class="btn">Check this name!</button>
   </div>
 </div>
 
