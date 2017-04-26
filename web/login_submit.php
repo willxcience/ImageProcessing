@@ -71,7 +71,7 @@ else
 
         /*** bind the parameters ***/
         $stmt->bindParam(':phpro_username', $phpro_username, PDO::PARAM_STR);
-        $stmt->bindParam(':phpro_password', $phpro_password, PDO::PARAM_STR, 40);
+        $stmt->bindParam(':phpro_password', $phpro_password, PDO::PARAM_STR);
 
         /*** execute the prepared statement ***/
         $stmt->execute();
@@ -87,19 +87,22 @@ else
         /*** if we do have a result, all is well ***/
         else
         {
-                /*** set the session user_id variable ***/
+			session_start();
+			
+				/*** set the session user_id variable ***/
                 $_SESSION['user_id'] = $user_id;
 
                 /*** tell the user we are logged in ***/
                 $message = 'You are now logged in';
+
+
 		/* Redirect browser */
-		header("Location: http://10.0.2.15/");
+		header("Location: /");
  
 		/* Make sure that code below does not get executed when we redirect. */
     		exit;
 		
         }
-
 
     }
     catch(Exception $e)

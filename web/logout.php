@@ -7,6 +7,8 @@ session_unset();
 
 // Destroy the session.
 session_destroy();
+/* Redirect browser */
+		header("Location: /");
 ?>
 <html>
 <head>

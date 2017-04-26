@@ -1,71 +1,117 @@
+<?php
+session_start();
+if(!isset($_SESSION['user_id'])){
+   header("location:login.php");
+   die;
+}
+    /*** mysql hostname ***/
+    $mysql_hostname = 'localhost';
+
+    /*** mysql username ***/
+    $mysql_username = 'mysql_username';
+
+    /*** mysql password ***/
+    $mysql_password = 'mysql_password';
+
+    /*** database name ***/
+    $mysql_dbname = 'phpro_auth';
+	$id = $_SESSION['user_id'];
+	$dbh = new PDO("mysql:host=$mysql_hostname;dbname=$mysql_dbname", $mysql_username, $mysql_password);
+	$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+	$stmt = $dbh->prepare("SELECT phpro_user_id FROM admins WHERE phpro_user_id = :id");
+	$stmt->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_STR);
+	$stmt->execute();
+	$user_id = $stmt->fetchColumn();
+									
+/*	if($user_id == true){
+		echo "ADMIN";
+	}
+	else{
+		echo "Standard";
+	}
+*/
+?>
 <html>
-<head>
-</head>
-<body>
-<h1>Animal Images Process </h1>
 
-<!--
-<form action="search.php" method="post">
-Pls enter ur key:
-<input type="text" name="key"><br>
-<input type="submit">
-</form>
--->
-
-<!--
-<form action="upload.php" method="post" enctype="multipart/form-data">
-<table width="350" border="0" cellpadding="1" cellspacing="1" class="box">
-<tr> 
-<td width="246">
-<input type="hidden" name="MAX_FILE_SIZE" value="2000000">
-<input name="userfile" type="file" id="userfile"> 
-</td>
-<td width="80"><input name="upload" type="submit" class="box" id="upload" value=" Upload "></td>
-</tr>
-</table>
-</form>
--->
-
+<img src="IMAGEDATA/test/MDGC0015.JPG" alt="Mountain View" style="width:304px;height:228px;">
 
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
 <!-- jQuery library -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-
 <!-- Latest compiled JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-<!-- original upload file
-<form action="upload2.php" method="post" enctype="multipart/form-data">
-     Upload Files :
-    <input type="file" name="files[]" id="files" multiple="" directory="" webkitdirectory="" mozdirectory="">
-    <input class="button" type="submit" value="Upload" />
-</form>
--->
+<h1>Image Processing for Animals</h1>
 
-<form action="login.php" class="form-horizontal">
+<br>
+<br>
+
+<body>
+
+<form action="logout.php" class="form-horizontal">
 <fieldset>
 
 <!-- Form Name -->
-<legend>Login</legend>
+<legend>Logout</legend>
 
 <!-- Button -->
 <div class="form-group">
   <label class="col-md-4 control-label" for="singlebutton"></label>
   <div class="col-md-4">
-    <button id="singlebutton" name="singlebutton" class="btn btn-success">Login</button>
+    <button id="singlebutton" name="singlebutton" class="btn btn-success">Logout</button>
+  </div>
+</div>
+</fieldset>
+</form>
+
+<form action="change_password.php" class="form-horizontal">
+<fieldset>
+
+<!-- Form Name -->
+<legend>Change Password</legend>
+
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="singlebutton"></label>
+  <div class="col-md-4">
+    <button id="singlebutton" name="singlebutton" class="btn btn-success">Change Password</button>
   </div>
 </div>
 
 </fieldset>
 </form>
 
-<form class="form-horizontal" action="upload2.php"  method="post" enctype="multipart/form-data">
+
+
+
+<!-- ADMIN CONTROLS -->
+<?php if($user_id == true) : ?>
+
+
+<!-- Upload a Folder -->
+<form class="form-horizontal" name = "myForm" action="upload.php"  method="post" enctype="multipart/form-data">
 <fieldset>
 
 <!-- Form Name -->
 <legend>Upload All Files Under A Directory</legend>
+
+<!-- Select a folder -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="foldername">Create a new name</label>
+  <div class="col-md-4">
+    <input type='text' name='foldername'>
+  </div>
+</div>
+
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="submit"></label>
+  <div class="col-md-4">
+    <button id="submit" name="submit_check" class="btn">Check this name!</button>
+  </div>
+</div>
 
 <!-- File Button --> 
 <div class="form-group">
@@ -89,8 +135,19 @@ Pls enter ur key:
 
 
 
-<form action="download2.php" class="form-horizontal">
+
+<!-- Download a project -->
+<form action="download.php" class="form-horizontal">
 <fieldset>
+
+<!-- Select a folder -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="foldername">Input the folder name</label>
+  <div class="col-md-4">
+    <input type='text' name='foldername'>
+  </div>
+</div>
+
 
 <!-- Form Name -->
 <legend>Download All Images</legend>
@@ -109,9 +166,19 @@ Pls enter ur key:
 
 
 
-
-<form action="clean.php" class="form-horizontal">
+<!-- Clean a folder -->
+<form action="clean.php" class="form-horizontal"  method="post" onSubmit="return check()">
 <fieldset>
+
+
+<!-- Select a folder -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="foldername">Clean this folder</label>
+  <div class="col-md-4">
+    <input type='text' name='foldername'>
+  </div>
+</div>
+
 
 <!-- Form Name -->
 <legend>Clean The Database</legend>
@@ -120,6 +187,15 @@ Pls enter ur key:
 <div class="form-group">
   <label class="col-md-4 control-label" for="singlebutton"></label>
   <div class="col-md-4">
+    <script>
+    function check()
+    {
+        if (confirm("Warning! Data will be deleted!"))
+          return true;
+        else
+          return false;
+    }
+    </script>
     <button id="singlebutton" name="singlebutton" class="btn btn-danger">Clean</button>
   </div>
 </div>
@@ -128,11 +204,24 @@ Pls enter ur key:
 </form>
 
 
-<form action="process.php" class="form-horizontal">
+
+
+<!-- Processing Images -->
+<form action="process.php" class="form-horizontal" method="post">
 <fieldset>
 
 <!-- Form Name -->
 <legend>Process</legend>
+
+
+<!-- Select a folder -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="foldername">Input the folder name</label>
+  <div class="col-md-4">
+    <input type='text' name='foldername'>
+  </div>
+</div>
+
 
 <!-- Button -->
 <div class="form-group">
@@ -145,18 +234,7 @@ Pls enter ur key:
 </fieldset>
 </form>
 
+<?php endif; ?>
 
-<form action="test.php" method="post" enctype="multipart/form-data">
-    Select image to upload:
-    <input type="file" name="fileToUpload" id="fileToUpload">
-    <input type="submit" value="Upload Image" name="submit">
-</form>
-
-<!--
-<?php
-echo '<a href="download2.php">Download All Images</br>';
-echo '<a href="clean.php">Clean the database</br>';
-?>
--->
 </body>
 </html>

@@ -1,30 +1,59 @@
 <?php
-error_reporting(E_ALL); ini_set('display_errors', '1');
-include "start.php";
-$query = "SELECT name, type, size, content FROM upload ORDER by name"; 
-$result = $mysqli->query($query) or die('Error, query failed');
-if($result->num_rows==0){
-        echo "Database is empty <br>";
-		exit;
-    }
-$i=0;
-//$output = shell_exec('echo hello') or die("failed");
-//echo "<pre>$output</pre>";
-//$output=shell_exec("/home/houlor/temp/Background IMG_0001.JPG IMG_0002.JPG IMG_0003.JPG") or die("failed one");
-//echo "<pre>$output</pre>";
-while(list($name) = $result->fetch_row() )
-{
-$temp =array();
-array_push($temp,$name);
-list($name) = $result->fetch_row();
-array_push($temp,$name);
-list($name) = $result->fetch_row();
-array_push($temp,$name);
-//echo $i.": ".$temp[0]." ".$temp[1]." ".$temp[2]."<br>";
-//$i=$i+1;
-$output=shell_exec("/home/houlor/temp/Background ".$temp[0]." ".$temp[1]." ".$temp[2]) or die("failed");
-echo "<pre>$output</pre>";
-//echo "/home/houlor/temp/Background ".$temp[0]." ".$temp[1]." ".$temp[2]." >debug.txt";
+
+session_start();
+if(!isset($_SESSION['user_id'])){
+   header("location:login.php");
+   die;
 }
-//exec(process.out) ;
+
+error_reporting(E_ALL); ini_set('display_errors', '1');
+
+$host= "localhost";
+$username="root";
+$userpass="usbw";
+$databasew="test";
+$mysqli = new mysqli($host,$username,$userpass,$databasew);
+if ($mysqli->connect_errno){
+    echo "huston we have a problem";
+}
+
+$foldername =  $_POST['foldername'];
+
+if (empty($foldername)){
+    die("Please enter a name!\n");
+}
+
+$sql = 'SELECT path FROM upload WHERE foldername ="' . $foldername . '" ORDER by path';
+$result = $mysqli->query($sql) or die("Error, query failed" . mysqli_error($mysqli));
+
+if (mysqli_num_rows($result) == 0){
+    die("Cannot find the folder!");
+} else {
+    echo "Processing folder " . $foldername . "\n";
+}
+
+
+while($row = $result->fetch_row()) {
+    $temp =array();
+    array_push($temp,$row[0]);
+    $row = $result->fetch_row();
+    array_push($temp,$row[0]);
+    $row = $result->fetch_row();
+    array_push($temp,$row[0]);
+
+    $output=shell_exec("/home/applications/Background ".$temp[0]." ".$temp[1]." ".$temp[2]);
+
+    if ($output != -1) {
+        foreach($temp as $i) {
+            $sql = 'UPDATE upload SET backgroundProcessed = 1 Where path = "' . $i . '"';
+            $mysqli->query($sql);
+
+	    	if ($output == 1) {
+            	$sql = 'UPDATE upload SET isBackground = ' .$output . ' Where path = "' . $i . '"';
+            	$mysqli->query($sql);
+			}
+
+        }
+    }
+}
 ?>

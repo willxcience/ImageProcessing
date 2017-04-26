@@ -34,6 +34,9 @@ elseif (ctype_alnum($_POST['phpro_password']) != true)
         /*** if there is no match ***/
         $message = "Password must be alpha numeric";
 }
+elseif($_POST['phpro_password'] != $_POST['phpro_password_retype']){
+	$message = "Passwords do not match";
+}
 else
 {
     /*** if we are here the data is valid and we can insert it into database ***/
@@ -77,10 +80,8 @@ else
         /*** unset the form token session variable ***/
         unset( $_SESSION['form_token'] );
 
-        /*** if all is done, say thanks ***/
-        $message = 'New user added';
 	/* Redirect browser */
-	header("Location: http://10.0.2.15/login.php");
+	header("Location: /");
  
 	/* Make sure that code below does not get executed when we redirect. */
 	exit;
