@@ -60,6 +60,23 @@ else if(!isset($_SESSION['admin'])){
 </fieldset>
 </form>
 
+<form action="add_admin.php" class="form-horizontal">
+<fieldset>
+
+<!-- Form Name -->
+<legend>Add New Admin</legend>
+
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="singlebutton"></label>
+  <div class="col-md-4">
+    <button id="singlebutton" name="singlebutton" class="btn btn-success">Add Admin</button>
+  </div>
+</div>
+
+</fieldset>
+</form>
+
 
 
 
