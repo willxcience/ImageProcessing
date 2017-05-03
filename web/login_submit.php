@@ -55,7 +55,7 @@ else
     $mysql_password = 'mysql_password';
 
     /*** database name ***/
-    $mysql_dbname = 'phpro_auth';
+    $mysql_dbname = 'animal_auth';
 
     try
     {
@@ -94,15 +94,29 @@ else
 
                 /*** tell the user we are logged in ***/
                 $message = 'You are now logged in';
+				
+				
+				// Test if user is ADMIN
+				/*** database name ***/
+				$mysql_dbname = 'animal_auth';
+				$id = $_SESSION['user_id'];
+				$dbh = new PDO("mysql:host=$mysql_hostname;dbname=$mysql_dbname", $mysql_username, $mysql_password);
+				$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+				$stmt = $dbh->prepare("SELECT phpro_user_id FROM admins WHERE phpro_user_id = :id");
+				$stmt->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_STR);
+				$stmt->execute();
+				$is_admin = $stmt->fetchColumn();
+				if($is_admin == true){
+					$_SESSION['admin'] = $user_id;
+				}
 
-		/* Redirect browser */
-		header("Location: /");
- 
-		/* Make sure that code below does not get executed when we redirect. */
-    		exit;
-		
-        }
+				/* Redirect browser */
+				header("Location: /");
+		 
+				/* Make sure that code below does not get executed when we redirect. */
+					exit;		
+				}
 
     }
     catch(Exception $e)

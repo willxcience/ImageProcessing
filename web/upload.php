@@ -12,7 +12,7 @@ $target_dir = "/mnt/data/IMAGEDATA/";
 $host= "localhost";
 $username="root";
 $userpass="usbw";
-$databasew="test";
+$databasew="animal";
 $mysqli = new mysqli($host,$username,$userpass,$databasew);
 
 if ($mysqli->connect_errno){
@@ -26,7 +26,7 @@ if (isset($_POST['submit_check'])){
     if (!$foldername)
         $Warning = "Please enter a name!";
 	else {
-		$sql ='select * from upload where foldername ="' . $foldername . '"';
+		$sql ='select * from image where foldername ="' . $foldername . '"';
     	$result = $mysqli->query($sql);
 
 		$tmp = mysqli_num_rows($result);
@@ -48,7 +48,7 @@ if (isset($_POST['submit'])){
     if (!$foldername)
         die("Please enter a name!");
 
-    $sql ='select * from upload where foldername ="' . $foldername . '"';
+    $sql ='select * from image where foldername ="' . $foldername . '"';
     $result = $mysqli->query($sql) or die('Error, query failed');
 
     if (mysqli_num_rows($result)){
@@ -81,7 +81,7 @@ if (isset($_POST['submit'])){
 
             $folderpath = $target_dir . basename($foldername);
 
-            $sql = "INSERT INTO upload (foldername, size, type, path, folderpath) ".
+            $sql = "INSERT INTO image (foldername, size, type, path, folderpath) ".
             "VALUES ('$foldername', '$fileSize', '$fileType', '$target_file', '$folderpath')";
             
             $mysqli->query($sql) or die("Error, updating query failed" . mysqli_error($mysqli));

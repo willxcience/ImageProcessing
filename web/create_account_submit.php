@@ -57,7 +57,7 @@ else
     $mysql_password = 'mysql_password';
 
     /*** database name ***/
-    $mysql_dbname = 'phpro_auth';
+    $mysql_dbname = 'animal_auth';
 
     try
     {
