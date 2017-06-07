@@ -1,0 +1,18 @@
+.borderlist {
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+.btn span.glyphicon {    			
+	opacity: 0;				
+}
+.btn.active span.glyphicon {				
+	opacity: 1;				
+}
+.btn_my {
+    position:absolute;
+    bottom:0px;
+    right:10px;
+    width:25px;
+    height:25px;
+}
+

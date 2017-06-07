@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" type="text/css" href="aa.css" media="all" />
+<link rel="stylesheet" type="text/css" href="./test/css/bootstrap.css" media="all" />
+<link rel="stylesheet" type="text/css" href="./test/css/bootstrap.min.css" media="all" />
+<link rel="stylesheet" type="text/css" href="./test/css/bootstrap-theme.css" media="all" />
+<link rel="stylesheet" type="text/css" href="./test/css/bootstrap-theme.min.css" media="all" />
+
+
+<head>
+    <meta charset="utf-8">
+    <div class="container-fluid" id="main_w">
+        <div class="row">
+            <div class="col-sm-6" style="background-color:green;height:600px">
+                <div class="empty" style="height:500px"></div>
+                <a id="add_row" class="btn btn-default pull-right">Add Row</a> 1 of 1
+            </div>
+            <div class="col-sm-3" style="background-color:white;height:600px">
+                <div class="btn-group-lg" id="g1">
+
+                </div>
+            </div>
+            <div class="col-sm-3" style="background-color:yellow;height:600px">
+                1 of 3
+            </div>
+        </div>
+    </div>
+</head>
+
+<body>
+    <script src="/test/js/jquery-3.2.1.js"></script>
+    <script src="/test/js/bootstrap.js"></script>
+    <script src="/test/js/bootstrap.min.js"></script>
+    <script src="http://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript">
+        /*for (i = 0; i < 4; i++) {
+            var button = '<button2 type="button" id="xiexie" class="btn btn-primary pull-left" data-toggle="button" position="absolute" display="inline-block" aria-pressed="false" autocomplete="off" onclick="run()">' + ' Single toggle' + '</button2>';
+            $("#container").append(button);
+        }*/
+
+        $(document).ready(function () {
+            $("#add_row").on("click", function () {
+
+                var newid = $('#main_w button').length;
+                //console.log(newid);
+                var butt = $("<button></button>", {
+                    id: "addr" + newid,
+                    type: "button",
+                    class: "btn btn-primary",
+                    text: "NO." + newid,
+                    "data-id": newid
+                });
+                butt.on("click", function () {
+                console.log($(this).text());
+                });
+                butt.appendTo($('#g1'));
+            });
+        });
+    </script>
+</body>
